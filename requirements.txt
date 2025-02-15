@@ -1,0 +1,12 @@
+
+
+# external requirements
+
+awscli
+flake8
+git
+dvc
+nltk
+xgboost
+numpy
+pandas
