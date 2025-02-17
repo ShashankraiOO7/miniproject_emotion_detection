@@ -64,9 +64,9 @@ def predict():
 
     # prediction
     result = model.predict(features)
-    return str(result)
+    #return str(result)
     # show
-    #return render_template('web_page.html', result=result[0])
+    return render_template('web_page.html', result=result)
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True)

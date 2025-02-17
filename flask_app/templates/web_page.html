@@ -1,11 +1,80 @@
 <!DOCTYPE html>
-
 <html>
     <head>
         <title>Sentiment Analysis</title>
+        <style>
+            body {
+                background-color: #4B0082;
+                color: white;
+                font-family: Arial, sans-serif;
+                text-align: center;
+                padding: 20px;
+                animation: fadeIn 2s;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            h1 {
+                font-size: 50px;
+                text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+                animation: bounce 1.5s infinite;
+            }
+
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+
+            form {
+                background: rgba(255, 255, 255, 0.1);
+                padding: 20px;
+                border-radius: 15px;
+                box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+                transition: transform 0.3s;
+            }
+
+            form:hover {
+                transform: scale(1.05);
+            }
+
+            textarea {
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 16px;
+            }
+
+            input[type="submit"] {
+                background-color: #32CD32;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                font-size: 18px;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+            input[type="submit"]:hover {
+                background-color: #228B22;
+            }
+
+            h2 {
+                font-size: 40px;
+                font-weight: bold;
+                animation: pulse 1.5s infinite;
+            }
+
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+            }
+        </style>
     </head>
 
-    <body style="background-color: brown">
+    <body>
         <h1>Sentiment Analysis</h1>
         <form action="/predict" method="POST">
             <label>Write text:</label><br>
@@ -13,12 +82,12 @@
             <input type="submit" value="Predict">
         </form>
 
-       <!-- {% if result is not none %}
+       {% if result is not none %}
             {% if result == 1 %}
-                <h2>Happy</h2>
+                <h2 style="color: #32CD32;">😊 Happy 😊</h2>
             {% else %}
-                <h2>Sad</h2>
+                <h2 style="color: #FF4500;">😢 Sad 😢</h2>
             {% endif %}
-        {% endif %} -->
+        {% endif %}
     </body>
 </html>
