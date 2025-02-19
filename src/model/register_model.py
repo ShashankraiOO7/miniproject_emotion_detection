@@ -1,4 +1,3 @@
-
 # register model
 
 import json
@@ -18,8 +17,10 @@ os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 dagshub_url = "https://dagshub.com"
 repo_owner = "ShashankraiOO7"
 repo_name = "miniproject_emotion_detection"
-# Set up MLflow tracking URI
 
+
+# Set up MLflow tracking URI
+mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
 
 
 # logging configuration
