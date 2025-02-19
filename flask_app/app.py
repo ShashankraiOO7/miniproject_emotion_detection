@@ -77,9 +77,8 @@ os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
 os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
 dagshub_url = "https://dagshub.com"
-repo_owner = "campusx-official"
-repo_name = "mlops-mini-project"
-
+repo_owner = "ShashankraiOO7"
+repo_name = "miniproject_emotion_detection"
 # Set up MLflow tracking URI
 mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
 
@@ -103,7 +102,7 @@ vectorizer = pickle.load(open('models/vectorizer.pkl','rb'))
 
 @app.route('/')
 def home():
-    return render_template('index.html',result=None)
+    return render_template('web_page.html',result=None)
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -124,7 +123,7 @@ def predict():
     result = model.predict(features_df)
 
     # show
-    return render_template('index.html', result=result[0])
+    return render_template('web_page.html', result=result[0])
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True)
