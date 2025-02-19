@@ -24,10 +24,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-            
+
       - name: install dependencies
         run: |
           pip install -r requirements.txt
+
+
+      - name: Configure DVC
+        run: |
+          dvc remote modify origin auth basic
+          dvc remote modify origin user ${{ secrets.ShashankraiOO7 }}
+          dvc remote modify origin password ${{ secrets.DAGSHUB_PAT }}
+
+      - name: Pull DVC Data
+        run: |
+          dvc pull
+          ls -la models/
 
       - name: run pipeline
         env:
