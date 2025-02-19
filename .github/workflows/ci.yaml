@@ -1,4 +1,4 @@
-name: CI pipeline Execution
+name: CI_Pipeline_Execution
 
 on:
   push
