@@ -81,6 +81,7 @@ def normalize_text(text):
 app = Flask(__name__)
 
 # load model from model registry
+# load model from model registry
 def get_latest_model_version(model_name):
     client = mlflow.MlflowClient()
     latest_version = client.get_latest_versions(model_name, stages=["Production"])
@@ -98,7 +99,7 @@ vectorizer = pickle.load(open('models/vectorizer.pkl','rb'))
 
 @app.route('/')
 def home():
-    return render_template('web_page.html',result=None)
+    return render_template('index.html',result=None)
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -117,9 +118,9 @@ def predict():
 
     # prediction
     result = model.predict(features_df)
-    #return str(result)
+
     # show
-    return render_template('web_page.html', result=result[0])
+    return render_template('index.html', result=result[0])
 
 if __name__ == "__main__":
     app.run(debug=True)
