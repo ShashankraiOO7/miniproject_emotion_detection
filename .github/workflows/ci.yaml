@@ -45,7 +45,7 @@ jobs:
         env:
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
         run: python scripts/promote_model.py
-
+      #flask pipeline
       - name: Run Flask app tests
         if: success()
         env:
