@@ -87,5 +87,5 @@ target/
 
 # Mypy cache
 .mypy_cache/
-myvenv
-reports
+
+myenv
