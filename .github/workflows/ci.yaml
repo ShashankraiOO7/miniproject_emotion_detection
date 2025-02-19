@@ -16,11 +16,11 @@ jobs:
         python-version:'3.10' 
         
       -name: install dependencies
-      runs: |
+      run: |
         pip install -r requirements.txt
 
       -name: run pipeline
       env:
         DAGSHUB_PATH:${{secrets.DAGSHUB_PATH}}
-      runs:
+      run:
         dvc repro
