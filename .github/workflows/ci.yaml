@@ -29,18 +29,6 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-
-      - name: Configure DVC
-        run: |
-          dvc remote modify origin auth basic
-          dvc remote modify origin user ${{ secrets.ShashankraiOO7 }}
-          dvc remote modify origin password ${{ secrets.DAGSHUB_PAT }}
-
-      - name: Pull DVC Data
-        run: |
-          dvc pull
-          ls -la models/
-
       - name: run pipeline
         env:
           DAGSHUB_PATH: ${{secrets.DAGSHUB_PATH}}
