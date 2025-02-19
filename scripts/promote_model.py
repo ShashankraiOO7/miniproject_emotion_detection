@@ -2,6 +2,7 @@
 
 import os
 import mlflow
+import dagshub
 
 def promote_model():
     # Set up DagsHub credentials for MLflow tracking
@@ -13,8 +14,8 @@ def promote_model():
     os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
     dagshub_url = "https://dagshub.com"
-    repo_owner = "campusx-official"
-    repo_name = "mlops-mini-project"
+    repo_owner = "ShashankraiOO7"
+    repo_name = "miniproject_emotion_detection"
 
     # Set up MLflow tracking URI
     mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
