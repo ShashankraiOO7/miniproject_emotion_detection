@@ -20,8 +20,16 @@ import dagshub
 
 
 #Setting up model Reprository/mlflow registory
-mlflow.set_tracking_uri('https://dagshub.com/ShashankraiOO7/miniproject_emotion_detection.mlflow')
-dagshub.init(repo_owner='ShashankraiOO7', repo_name='miniproject_emotion_detection', mlflow=True)
+dagshub_token = os.getenv("DAGSHUB_PAT")
+if not dagshub_token:
+    raise EnvironmentError("DAGSHUB_PAT environment variable is not set")
+
+os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+
+dagshub_url = "https://dagshub.com"
+repo_owner = "ShashankraiOO7"
+repo_name = "miniproject_emotion_detection"
 # Set up MLflow tracking URI
 
 
@@ -59,14 +67,14 @@ def predict():
     features = vectorizer.transform([text])
 
     # Convert sparse matrix to DataFrame
-    #features_df = pd.DataFrame.sparse.from_spmatrix(features)
-    #features_df = pd.DataFrame(features.toarray(), columns=[str(i) for i in range(features.shape[1])])
+    features_df = pd.DataFrame.sparse.from_spmatrix(features)
+    features_df = pd.DataFrame(features.toarray(), columns=[str(i) for i in range(features.shape[1])])
 
     # prediction
-    result = model.predict(features)
+    result = model.predict(features_df)
     #return str(result)
     # show
-    return render_template('web_page.html', result=result)
+    return render_template('web_page.html', result=result[0])
 
 if __name__ == "__main__":
     app.run(debug=True)
