@@ -1,6 +1,6 @@
-FROM python:3.10
+from python:3.10
 
-WORKDIR  /app
+workdir  /app
 
 copy flask_app/  /app/
 
@@ -12,6 +12,6 @@ run python -m nltk.downloader stopwords wordnet
 
 expose 5000
 
-CMD ["python","app.py"]
+cmd ["gunicorn", "--bind", "0.0.0.0:5000", "--timeout", "120", "app:app"]
 
 
