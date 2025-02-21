@@ -2,19 +2,19 @@ name: CI_Pipeline_Execution
 
 on:
   push
+
 jobs:
   project-testing:
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: setup python
+      - name: Setup Python
         uses: actions/setup-python@v2
-        with: 
-          python-version: '3.10' 
-
+        with:
+          python-version: '3.10'
 
       - name: Cache pip dependencies
         uses: actions/cache@v3
@@ -24,63 +24,55 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      - name: install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: run pipeline
+      - name: Run pipeline
         env:
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
-        run: |
-          dvc repro
-      #Running Testing of the Model
+        run: dvc repro
+
       - name: Run model tests
         env:
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
-        run: |
-          python -m unittest tests/test_model.py
+        run: python -m unittest tests/test_model.py
+
       - name: Promote model to Production
-        if: success()
+        if: ${{ success() }}
         env:
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
         run: python scripts/promote_model.py
-      #flask pipeline
+
       - name: Run Flask app tests
-        if: success()
+        if: ${{ success() }}
         env:
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
         run: python -m unittest tests/test_flask_app.py
 
-      # Docker Login for generating Docker Image
-      - name: Loging to Docker
-        if: success()
+      - name: Logging to Docker
+        if: ${{ success() }}
         uses: docker/login-action@v2
         with:
-          username: ${{secrets.DOCKER_HUB_USER_NAME}}
-          password: ${{secrets.DOCKER_HUB_ACCESSTOKEN}}
-          
-      - name: Docker Image Genereate
-        if: success()
-        run: |
-          docker build -t ${{secrets.DOCKER_HUB_USER_NAME}}/emotion2:1.0 .
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Docker Image Generate
+        if: ${{ success() }}
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/emotion2:1.0 .
 
       - name: Docker Image Push
-        if: success()
-        run: |
-          docker push ${{secrets.DOCKER_HUB_USER_NAME}}/emotion2:1.0
+        if: ${{ success() }}
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/emotion2:1.0
+
       - name: Deploy to EC2
-        if: success()
-        uses: appleby/ssh-action@v0.1.5
+        if: ${{ success() }}
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          scripts:  |
-              docker pull ${{secrets.DOCKER_HUB_USERNNAME }}/emtion2:1.0
-              docker stop my-app || true
-              docker rm my-app || true
-              docker run -p 1000:5000  -- name my-app\ -e DAGSHUB_PAT=${{ secrets.DAGSHUB_PAT }}\ ${{secrets.DOCKER_HUB_USERNNAME }}/emtion2:1.0
-
-
-
+          script: |
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/emotion2:1.0
+            docker stop my-app || true
+            docker rm my-app || true
+            docker run -d -p 1000:5000 --name my-app -e DAGSHUB_PAT=${{ secrets.DAGSHUB_PAT }} ${{ secrets.DOCKER_HUB_USERNAME }}/emotion2:1.0
