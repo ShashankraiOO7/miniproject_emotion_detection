@@ -60,7 +60,7 @@ jobs:
 
       - name: Tag Docker Image
         run: |
-          docker tag iamdocker:1.0.1 553666887971.dkr.ecr.eu-north-1.amazonaws.com/iamdocker:1.0.1
+          docker tag iamdocker:latest 553666887971.dkr.ecr.eu-north-1.amazonaws.com/iamdocker:1.0.1
 
       - name: Push Docker Image to AWS ECR
         run: |
@@ -69,17 +69,17 @@ jobs:
       - name: Pull Docker Image on EC2 or Depoly on EC2
         if : ${{success()}}
         uses: appleboy/ssh-action@v0.1.5
-        with:
-        host: ${{secrets.EC2_HOST}}
-        username: ${{secrets.EC2_USER}}
-        key: ${{secrets.EC2_SSH_KEY}}
-        script: |
-         aws configure set aws_access_key_id ${{secrets.aws_ACCESS_KEY_ID}}
-         aws configure set aws_secret_access_key${{secrets.aws_ACCESS_KEY_ID}}
-         aws configure set default.region eu-north-1
-         aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 553666887971.dkr.ecr.eu-north-1.amazonaws.com
-         docker stop my-app || true
-         docker rm my-app || true
-         docker run -p 8888:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  553666887971.dkr.ecr.eu-north-1.amazonaws.com/iamdocker:1.0.1
+        with: 
+          host: ${{secrets.EC2_HOST}}
+          username: ${{secrets.EC2_USER}}
+          key: ${{secrets.EC2_SSH_KEY}}
+          script: |
+            aws configure set aws_access_key_id ${{secrets.AWS_ACCESS_KEY_ID}}
+            aws configure set aws_secret_access_key${{secrets.AWS_ACCESS_KEY_ID}}
+            aws configure set default.region eu-north-1
+            aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 553666887971.dkr.ecr.eu-north-1.amazonaws.com
+            docker stop my-app || true
+            docker rm my-app || true
+            docker run -p 8888:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  553666887971.dkr.ecr.eu-north-1.amazonaws.com/iamdocker:1.0.1
 
 
