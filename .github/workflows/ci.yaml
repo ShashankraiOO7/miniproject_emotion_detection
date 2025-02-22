@@ -38,13 +38,13 @@ jobs:
         run: python -m unittest tests/test_model.py
 
       - name: Promote model to Production
-        if: ${{ success() }}
+        if: success()
         env:
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
         run: python scripts/promote_model.py
 
       - name: Run Flask app tests
-        if: ${{ success() }}
+        if: success()
         env:
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
         run: python -m unittest tests/test_flask_app.py
@@ -67,7 +67,7 @@ jobs:
           docker push 553666887971.dkr.ecr.eu-north-1.amazonaws.com/iamdocker:1.0.1
 
       - name: Pull Docker Image on EC2 or Depoly on EC2
-        if : ${{success()}}
+        if : success()
         uses: appleboy/ssh-action@v0.1.5
         with: 
           host: ${{secrets.EC2_HOST}}
