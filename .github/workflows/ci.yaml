@@ -80,6 +80,6 @@ jobs:
             aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 553666887971.dkr.ecr.eu-north-1.amazonaws.com
             docker stop my-app || true
             docker rm my-app || true
-            docker run -p 8888:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  553666887971.dkr.ecr.eu-north-1.amazonaws.com/iamdocker:1.0.1
+            docker run -p 80:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  553666887971.dkr.ecr.eu-north-1.amazonaws.com/iamdocker:1.0.1
 
 
