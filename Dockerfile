@@ -26,8 +26,8 @@ WORKDIR /app
 COPY --from=build /app /app
 
 # Double-check gunicorn installation (optional for debugging)
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip list
+RUN pip install gunicorn
 
 EXPOSE 5000
 
