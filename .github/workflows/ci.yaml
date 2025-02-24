@@ -60,11 +60,11 @@ jobs:
 
       - name: Tag Docker Image
         run: |
-          docker tag emotiondetection:latest 222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
+          docker tag emotiondetection:latest 222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:1.0.1
 
       - name: Push Docker Image to AWS ECR
         run: |
-          docker push 222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
+          docker push 222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:1.0.1
 
       - name: Pull Docker Image from ECR then Depoly on EC2
         if : success()
@@ -80,6 +80,6 @@ jobs:
             aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 222634383382.dkr.ecr.ap-south-1.amazonaws.com
             docker stop shashankraiCICD || true
             docker rm shashankraiCICD || true
-            docker run -p 80:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
+            docker run -p 80:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:l1.0.1
 
 
