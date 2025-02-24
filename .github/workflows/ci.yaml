@@ -53,20 +53,19 @@ jobs:
         run: |
           aws configure set aws_access_key_id ${{secrets.AWS_ACCESS_KEY_ID}}
           aws configure set aws_secret_access_key ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 222634383382.dkr.ecr.ap-south-1.amazonaws.com
-      - name: Build Docker Image
+          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 222634383382.dkr.ecr.ap-south-1.amazonaws.com - name: Build Docker Image
         run: |
           DOCKER_BUILDKIT=1 docker build -t emotiondetection .
 
       - name: Tag Docker Image
         run: |
-          docker tag emotiondetection:latest 222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:1.0.1
+          docker tag emotiondetection:latest 222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
 
       - name: Push Docker Image to AWS ECR
         run: |
-          docker push 222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:1.0.1
+          docker push 222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
 
-      - name: Pull Docker Image from ECR then Depoly on EC2
+      - name: Pull Docker Image on EC2 or Depoly on EC2
         if : success()
         uses: appleboy/ssh-action@v0.1.5
         with: 
@@ -76,10 +75,8 @@ jobs:
           script: |
             aws configure set aws_access_key_id ${{secrets.AWS_ACCESS_KEY_ID}}
             aws configure set aws_secret_access_key ${{secrets.AWS_SECRET_ACCESS_KEY}}
-            aws configure set default.region eu-north-1
-            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 222634383382.dkr.ecr.ap-south-1.amazonaws.com
+            aws configure set default.region ap-south-11
+            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 222634383382.dkr.ecr.ap-south-1.amazonaws.com  
             docker stop shashankraiCICD || true
             docker rm shashankraiCICD || true
-            docker run -p 80:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:1.0.1
-
-
+            docker run -p 80:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
