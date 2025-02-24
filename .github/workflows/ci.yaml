@@ -48,13 +48,15 @@ jobs:
         env:
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
         run: python -m unittest tests/test_flask_app.py
-       # AWS Connection
+
+      # AWS Connection
       - name: Login to AWS ECR
         run: |
           aws configure set aws_access_key_id ${{secrets.AWS_ACCESS_KEY_ID}}
           aws configure set aws_secret_access_key ${{secrets.AWS_SECRET_ACCESS_KEY}}
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 222634383382.dkr.ecr.ap-south-1.amazonaws.com 
-      - name:  Build Docker Image
+      
+      - name: Build Docker Image
         run: |
           DOCKER_BUILDKIT=1 docker build -t emotiondetection .
 
@@ -66,8 +68,8 @@ jobs:
         run: |
           docker push 222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
 
-      - name: Pull Docker Image FROM EC2 then Depoly on EC2
-        if : success()
+      - name: Pull Docker Image FROM EC2 then Deploy on EC2
+        if: success()
         uses: appleboy/ssh-action@v0.1.5
         with: 
           host: ${{secrets.EC2_HOST}}
@@ -76,15 +78,18 @@ jobs:
           script: |
             aws configure set aws_access_key_id ${{secrets.AWS_ACCESS_KEY_ID}}
             aws configure set aws_secret_access_key ${{secrets.AWS_SECRET_ACCESS_KEY}}
-            aws configure set default.region ap-south-11
+            aws configure set default.region ap-south-1
             aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 222634383382.dkr.ecr.ap-south-1.amazonaws.com  
 
             if [ "$(docker ps -q -f name=shashankraiCICD)" ]; then
                 echo "Stopping running container..."
                 docker stop shashankraiCICD
                 docker rm shashankraiCICD
+            elif [ "$(docker ps -aq -f name=shashankraiCICD)" ]; then
+                echo "Removing stopped container..."
+                docker rm shashankraiCICD
             else
-                echo "No running container found. Skipping stop and remove."
+                echo "No running or stopped container found. Skipping stop and remove."
             fi
 
             docker run -p 80:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
