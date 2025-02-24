@@ -80,6 +80,6 @@ jobs:
             aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 222634383382.dkr.ecr.ap-south-1.amazonaws.com
             docker stop shashankraiCICD || true
             docker rm shashankraiCICD || true
-            docker run -p 80:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:l1.0.1
+            docker run -p 80:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:1.0.1
 
 

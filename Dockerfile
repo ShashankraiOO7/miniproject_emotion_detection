@@ -1,36 +1,34 @@
-# --- Builder Stage ---
-    FROM python:3.10-slim as builder
+#BUILS STAGE STAGE 1
 
-    # Create a working directory for dependencies
-    WORKDIR /install
-    
-    # Copy only requirements for layer caching
-    COPY requirements.txt .  
-    
-    # Install dependencies in the default location
-    RUN pip install --no-cache-dir -r requirements.txt
-    
-    # Download NLTK data (this will work only if nltk is installed)
-    RUN python -m nltk.downloader stopwords wordnet
-    
-    # --- Final Stage ---
-    FROM python:3.10-slim
-    
-    # Copy installed dependencies from builder stage
-    COPY --from=builder /usr/local /usr/local
-    
-    # NLTK data environment variable
-    ENV NLTK_DATA=/usr/local/nltk_data
-    
-    # Create the working directory for your app
-    WORKDIR /app
-    
-    # Copy the rest of your app code
-    COPY . /app
-    
-    # Expose port 5000
-    EXPOSE 5000
-    
-    # Start your Flask/Gunicorn app
-    CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
-    
+FROM python:3.10 AS build
+
+WORKDIR  /app
+
+#copy the requirements.txt file from the flask_app folder
+COPY flask_app/requirements.txt  /app/
+
+#install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+#copy the applicatin code and model files
+COPY flask_app/ /app/
+COPY models/vectorizer.pkl  /app/models/vectorizer.pkl
+
+#DOWNLOAD ONLY THE NECESSARY NLTK data
+RUN python -m nltk.downloader stopwords wordnet
+
+
+#FINAL STAGE 
+#Stage 2
+FROM python:3.10-slim AS Final
+
+WORKDIR /app
+
+#COPY only the necessary NLTK data
+COPY --from=build /app /app
+
+EXPOSE 5000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--timeout", "3000", "app:app"]
+
+
