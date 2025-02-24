@@ -9,4 +9,3 @@ scikit-learn==1.5.1
 scipy==1.14.0
 pandas==2.2.3
 gunicorn
-#nltk==3.8.1
