@@ -5,12 +5,12 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Update the package lists and install necessary tools
 sudo apt-get update -y
-sudo apt-get install -y docker.io unzip curl
+sudo apt-get install -y docker.io 
 
 # Start and enable Docker service
 sudo systemctl start docker
 sudo systemctl enable docker
-
+sudo apt-get install -y unzip curl
 # Download and install AWS CLI
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/home/ubuntu/awscliv2.zip"
 unzip -o /home/ubuntu/awscliv2.zip -d /home/ubuntu/
