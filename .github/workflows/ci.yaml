@@ -80,7 +80,7 @@ jobs:
             aws configure set aws_secret_access_key ${{secrets.AWS_SECRET_ACCESS_KEY}}
             aws configure set default.region ap-south-1
             aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 222634383382.dkr.ecr.ap-south-1.amazonaws.com  
-
+            #this is to check if there is any another container with same name
             if [ "$(docker ps -q -f name=shashankraiCICD)" ]; then
                 echo "Stopping running container..."
                 docker stop shashankraiCICD
