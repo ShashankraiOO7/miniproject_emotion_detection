@@ -6,11 +6,8 @@ docker pull 222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:1.0
 
 
 # Check if the container is already running or exists
-if [ "$(sudo docker ps -aq -f name=shashankraiCICD)" ]; then
-    # Stop and remove the existing container
-    docker stop shashankraiCICD
-    docker rm shashankraiCICD
-fi
+docker stop my-container || true
+docker rm my-container || true
 
 # Run the Docker container
 docker run -d -p 80:5000 -e DAGSHUB_PAT=af702d31152ac81e1e55a4ca3ec2a47270c60970 --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:1.0
