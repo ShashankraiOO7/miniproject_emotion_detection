@@ -4,9 +4,9 @@
         <title>Sentiment Analysis</title>
         <style>
             body {
-                background: #800080; /* Solid purple color */
+                background: linear-gradient(135deg, #6a0dad, #ff00ff);
                 color: white;
-                font-family: Arial, sans-serif;
+                font-family: 'Poppins', sans-serif;
                 text-align: center;
                 padding: 20px;
             }
@@ -19,71 +19,61 @@
             h1 {
                 font-size: 50px;
                 text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+                animation: pulse 2s infinite;
+            }
+
+            form {
+                background: rgba(255, 255, 255, 0.15);
+                padding: 20px;
+                border-radius: 15px;
+                box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.6);
+            }
+
+            textarea {
+                border-radius: 10px;
+                padding: 10px;
+                font-size: 16px;
+                border: 2px solid #fff;
+                width: 80%;
+                max-width: 600px;
+                resize: none;
+            }
+
+            input[type="submit"] {
+                background: linear-gradient(90deg, #32CD32, #228B22);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                font-size: 18px;
+                border-radius: 10px;
+                cursor: pointer;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            }
+
+            input[type="submit"]:hover {
+                background: #228B22;
+                transform: translateY(-2px);
+            }
+
+            h2 {
+                font-size: 40px;
+                font-weight: bold;
+            }
+
+            .char-counter {
+                font-size: 14px;
+                margin-top: 10px;
+            }
+
+            .result-emoji {
+                font-size: 60px;
+                margin-top: 20px;
                 animation: bounce 1.5s infinite;
             }
 
             @keyframes bounce {
                 0%, 100% { transform: translateY(0); }
                 50% { transform: translateY(-10px); }
-            }
-
-            form {
-                background: rgba(255, 255, 255, 0.1);
-                padding: 20px;
-                border-radius: 15px;
-                box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
-                transition: transform 0.3s, box-shadow 0.3s;
-            }
-
-            form:hover {
-                transform: scale(1.05);
-                box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.7);
-            }
-
-            textarea {
-                border-radius: 5px;
-                padding: 10px;
-                font-size: 16px;
-                border: 2px solid #fff;
-                transition: border-color 0.3s, box-shadow 0.3s;
-            }
-
-            textarea:focus {
-                outline: none;
-                border-color: #32CD32;
-                box-shadow: 0 0 10px #32CD32;
-            }
-
-            input[type="submit"] {
-                background-color: #32CD32;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                font-size: 18px;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: background-color 0.3s, transform 0.3s;
-            }
-
-            input[type="submit"]:hover {
-                background-color: #228B22;
-                animation: rotateButton 0.5s linear;
-            }
-
-            @keyframes rotateButton {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-            }
-
-            h2 {
-                font-size: 40px;
-                font-weight: bold;
-                animation: pulse 1.5s infinite;
-            }
-
-            @keyframes pulse {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.1); }
             }
         </style>
     </head>
@@ -92,16 +82,27 @@
         <h1>Sentiment Analysis</h1>
         <form action="/predict" method="POST">
             <label>Write text:</label><br>
-            <textarea name="text" rows="10" cols="40"></textarea><br>
+            <textarea name="text" rows="10" cols="40" oninput="updateCharCount(this)"></textarea>
+            <div class="char-counter" id="charCounter">0/500 characters</div>
+            <br>
             <input type="submit" value="Predict">
         </form>
 
-       {% if result is not none %}
+        {% if result is not none %}
             {% if result == 1 %}
-                <h2 style="color: #32CD32;">😊 Happy 😊</h2>
+                <div class="result-emoji">😊</div>
+                <h2 style="color: #32CD32;">Happy</h2>
             {% else %}
-                <h2 style="color: #FF4500;">😢 Sad 😢</h2>
+                <div class="result-emoji">😢</div>
+                <h2 style="color: #FF4500;">Sad</h2>
             {% endif %}
         {% endif %}
+
+        <script>
+            function updateCharCount(textarea) {
+                const counter = document.getElementById('charCounter');
+                counter.textContent = `${textarea.value.length}/500 characters`;
+            }
+        </script>
     </body>
 </html>
