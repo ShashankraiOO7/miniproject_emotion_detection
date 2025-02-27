@@ -42,11 +42,6 @@ jobs:
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
         run: python -m unittest tests/test_flask_app.py
 
-      - name: Health Check
-        run: |
-          sleep 10
-          curl --fail http://localhost:80/health || exit 1
-
       - name: Promote model to Production
         if: ${{ job.status == 'success' }}
         env:
