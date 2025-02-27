@@ -37,23 +37,27 @@ jobs:
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
         run: python -m unittest tests/test_model.py
 
-      - name: Promote model to Production
-        if: success()
-        env:
-          DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
-        run: python scripts/promote_model.py
-
       - name: Run Flask app tests
-        if: success()
         env:
           DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
         run: python -m unittest tests/test_flask_app.py
 
+      - name: Health Check
+        run: |
+          sleep 10
+          curl --fail http://localhost:80/health || exit 1
+
+      - name: Promote model to Production
+        if: ${{ job.status == 'success' }}
+        env:
+          DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
+        run: python scripts/promote_model.py
+
       # AWS Connection
       - name: Login to AWS ECR
         run: |
-          aws configure set aws_access_key_id ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws configure set aws_secret_access_key ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 222634383382.dkr.ecr.ap-south-1.amazonaws.com 
       
       - name: Build Docker Image
@@ -69,28 +73,26 @@ jobs:
           docker push 222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
 
       - name: Pull Docker Image FROM EC2 then Deploy on EC2
-        if: success()
+        if: ${{ job.status == 'success' }}
         uses: appleboy/ssh-action@v0.1.5
         with: 
-          host: ${{secrets.EC2_HOST}}
-          username: ${{secrets.EC2_USER}}
-          key: ${{secrets.EC2_SSH_KEY}}
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            aws configure set aws_access_key_id ${{secrets.AWS_ACCESS_KEY_ID}}
-            aws configure set aws_secret_access_key ${{secrets.AWS_SECRET_ACCESS_KEY}}
+            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws configure set default.region ap-south-1
             aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 222634383382.dkr.ecr.ap-south-1.amazonaws.com  
-            #this is to check if there is any another container with same name
+            
             if [ "$(docker ps -q -f name=shashankraiCICD)" ]; then
-                echo "Stopping running container..."
-                docker stop shashankraiCICD
-                docker rm shashankraiCICD
-            elif [ "$(docker ps -aq -f name=shashankraiCICD)" ]; then
-                echo "Removing stopped container..."
-                docker rm shashankraiCICD
-            else
-                echo "No running or stopped container found. Skipping stop and remove."
+              docker stop shashankraiCICD
             fi
 
-            docker run -d  -p 80:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
-            
+            if [ "$(docker ps -aq -f name=shashankraiCICD)" ]; then
+              docker rm shashankraiCICD
+            fi
+
+            docker run -d -p ${{ secrets.APP_PORT }}:5000 -e DAGSHUB_PAT=${{ secrets.DAGSHUB_PAT }} --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
+
+            echo "Deployment complete!"
