@@ -92,5 +92,5 @@ jobs:
                 echo "No running or stopped container found. Skipping stop and remove."
             fi
 
-            docker run  -p 80:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
+            docker run -d  -p 80:5000 -e DAGSHUB_PAT=${{secrets.DAGSHUB_PAT}} --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
             
