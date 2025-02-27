@@ -4,7 +4,7 @@
         <title>Sentiment Analysis</title>
         <style>
             body {
-                background: linear-gradient(45deg, #FF6347, #6a5acd, #32cd32);
+                background: linear-gradient(45deg, #87CEFA, #B0E0E6, #ADD8E6);
                 background-size: 400% 400%;
                 animation: gradientBG 6s ease infinite;
                 color: white;
@@ -93,7 +93,7 @@
         <form action="/predict" method="POST">
             <label>Write text:</label><br>
             <textarea name="text" rows="10" cols="40" oninput="updateCharCount(this)"></textarea>
-            <div class="char-counter" id="charCounter">0/500 characters | 0 words</div>
+            <div class="char-counter" id="charCounter">0/500 characters | 0 words | 0 paragraphs</div>
             <div class="btn-group">
                 <input type="submit" value="Predict">
                 <input type="button" value="Clear" onclick="clearText()">
@@ -115,7 +115,8 @@
                 const counter = document.getElementById('charCounter');
                 const charCount = textarea.value.length;
                 const wordCount = textarea.value.trim().split(/\s+/).filter(Boolean).length;
-                counter.textContent = `${charCount}/500 characters | ${wordCount} words`;
+                const paragraphCount = textarea.value.split(/\n+/).filter(Boolean).length;
+                counter.textContent = `${charCount}/500 characters | ${wordCount} words | ${paragraphCount} paragraphs`;
             }
 
             function clearText() {

@@ -67,40 +67,31 @@ jobs:
         run: |
           docker push 222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
 
-      - name: Pull Docker Image FROM EC2 then Deploy on EC2
-        if: ${{ job.status == 'success' }}
-        uses: appleboy/ssh-action@v0.1.5
-        with: 
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            if ! command -v aws &> /dev/null
-            then
-                echo "AWS CLI not found. Installing..."
-                sudo apt-get update
-                sudo apt-get install -y unzip
-                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                unzip awscliv2.zip
-                sudo ./aws/install
-                echo "AWS CLI installed successfully."
-            else
-                echo "AWS CLI is already installed."
-            fi
+      # Zip the required files
+      - name: Zip files for deployment
+        if: success()
+        run: |
+          zip -r deployment.zip appspec.yml deploy/scripts/install_dependencies.sh deploy/scripts/start_docker.sh
 
-            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws configure set default.region ap-south-1
-            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 222634383382.dkr.ecr.ap-south-1.amazonaws.com  
-            
-            if [ "$(docker ps -q -f name=shashankraiCICD)" ]; then
-              docker stop shashankraiCICD
-            fi
+      # Upload the ZIP file to S3
+      - name: Upload ZIP to S3
+        if: success()
+        run: |
+          aws s3 cp deployment.zip s3://newcodedeploy01/deployment.zip
 
-            if [ "$(docker ps -aq -f name=shashankraiCICD)" ]; then
-              docker rm shashankraiCICD
-            fi
+      # Deploy to AWS CodeDeploy using the uploaded ZIP file
+      - name: Deploy to AWS CodeDeploy
+        if: success()
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws deploy create-deployment \
+            --application-name NewCodeDeploy \
+            --deployment-config-name CodeDeployDefault.OneAtATime \
+            --deployment-group-name NewCodeDeploy \
+            --s3-location bucket=newcodedeploy01,key=deployment.zip,bundleType=zip \
+            --file-exists-behavior OVERWRITE \
+            --region ap-south-1
 
-            docker run -p 80:5000 -e DAGSHUB_PAT=${{ secrets.DAGSHUB_PAT }} --name shashankraiCICD  222634383382.dkr.ecr.ap-south-1.amazonaws.com/emotiondetection:latest
 
-            echo "Deployment complete!"
+      
