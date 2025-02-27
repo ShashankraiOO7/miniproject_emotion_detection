@@ -86,9 +86,9 @@ jobs:
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws deploy create-deployment \
-            --application-name NewCodeDeploy \
+            --application-name NewCodeDeployCICD \
             --deployment-config-name CodeDeployDefault.OneAtATime \
-            --deployment-group-name NewCodeDeploy \
+            --deployment-group-name NewCodeDeployCICD \
             --s3-location bucket=newcodedeploy01,key=deployment.zip,bundleType=zip \
             --file-exists-behavior OVERWRITE \
             --region ap-south-1
